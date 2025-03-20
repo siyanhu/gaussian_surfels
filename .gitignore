@@ -17,3 +17,4 @@ submodules/diff_gaussian_rasterization/build
 submodules/diff_gaussian_rasterization/dist
 submodules/omnidata/pretrained_models
 
+scene_*

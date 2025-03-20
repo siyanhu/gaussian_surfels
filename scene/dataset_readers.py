@@ -88,9 +88,10 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
         height = intr.height
         width = intr.width        
         
-        image_path = os.path.join(images_folder, os.path.basename(extr.name))
-        image_name = os.path.basename(image_path).split(".")[0]
-        # print(image_path)
+        image_path = os.path.join(images_folder, extr.name)
+        image_name = os.path.splitext(extr.name)[0]
+        if not os.path.exists(image_path):
+            continue
         image = Image.open(image_path)
 
         uid = intr.id
@@ -125,10 +126,9 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
             # exit()
             assert False, "Colmap camera model not handled: only undistorted datasets (PINHOLE or SIMPLE_PINHOLE cameras) supported!"
 
-
-
         try:
-            monoN = read_monoData(f'{images_folder}/../normal/{image_name}_normal.npy')
+            normal_dir = os.path.join(os.path.dirname(images_folder), 'normals')
+            monoN = read_monoData(f'{normal_dir}/{image_name}_normal.npy')
             try:
                 monoD = read_monoData(f'{images_folder}/../depth/{image_name}_depth.npy')
             except FileNotFoundError:
@@ -138,7 +138,8 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
             mono = None
 
         try:
-            mask = load_mask(f'{images_folder}/../mask/{image_name[-3:]}.png')[None]
+            mask_dir = os.path.join(os.path.dirname(images_folder), 'masks')
+            mask = load_mask(f'{mask_dir}/{image_name}.png')
         except FileNotFoundError:
             mask = np.ones([1, image.size[1], image.size[0]]).astype(np.float32)
 
